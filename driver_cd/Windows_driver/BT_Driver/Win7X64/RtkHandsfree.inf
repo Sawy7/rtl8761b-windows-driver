@@ -1,0 +1,93 @@
+
+;/*++
+;
+;Copyright (c) Microsoft Corporation.  All rights reserved.
+;
+;Module Name:
+;
+;    TRtkHandsfree.inf
+;
+;Abstract:
+;    INF file for installing hf drivers
+;
+;--*/
+
+[Version]
+Signature="$WINDOWS NT$"
+;Class=Bluetooth
+;ClassGuid ={e0cbf06c-cd8b-4647-bb8a-263b43f0f974}
+Class=System
+ClassGuid ={4D36E97D-E325-11CE-BFC1-08002BE10318}
+
+Provider=%ManufacturerName%
+CatalogFile=RtkHandsfree.cat
+;DriverVer= 2012/11/26; TODO: set DriverVer in stampinf property pages
+DriverVer=12/28/2012,1.0.1.1
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+; ================= Class section =====================
+
+;[ClassInstall32]
+;Addreg=SampleClassReg
+
+;[SampleClassReg]
+;HKR,,,0,%ClassName%
+;HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+RtkHandsfree.sys  = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+;%BthAudioHF.DeviceDesc%=BthAudioHF,,BTHENUM\{0000111f-0000-1000-8000-00805F9B34FB}_LOCALMFG&005d
+
+
+%RtkHandsfree.DeviceDesc%=RtkHandsfree_Device, BTHENUM\{0000111f-0000-1000-8000-00805F9B34FB}_LOCALMFG&005d ; TODO: edit hw-id
+
+
+[RtkHandsfree_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+RtkHandsfree.sys
+
+;-------------- Service installation
+[RtkHandsfree_Device.NT.Services]
+AddService = RtkHandsfree,%SPSVCINST_ASSOCSERVICE%, RtkHandsfree_Service_Inst
+
+; -------------- RtkHandsfree driver install sections
+[RtkHandsfree_Service_Inst]
+DisplayName    = %RtkHandsfree.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\RtkHandsfree.sys
+LoadOrderGroup = Extended Base
+
+;[RtkHandsfree.Interface.Install]
+;BTAudio.SysFx.Render 
+;
+;--- RtkHandsfree_Device Coinstaller installation ------
+;
+
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="Realtek Semiconductor Corp." ; TODO: add ManufacturerName
+;ClassName="Bluetooth" ; TODO: edit ClassName
+ClassName="System" ; TODO: edit ClassName
+
+DiskName = "RtkHandsfree Installation Disk"
+RtkHandsfree.DeviceDesc = "RtkHandsfree Device"
+RtkHandsfree.SVCDESC = "RtkHandsfree Service"

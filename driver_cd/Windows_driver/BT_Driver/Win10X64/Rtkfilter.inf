@@ -1,0 +1,101 @@
+;/*++
+;
+;Copyright (c) 2009-2013 Realtek Semiconductor Corporation All rights Reserved
+;
+;Module Name:
+;
+;    Btfilter.INF
+;--*/
+[Version]
+Signature   = "$WINDOWS NT$"
+Class=Bluetooth
+CLASSGUID={e0cbf06c-cd8b-4647-bb8a-263b43f0f974}
+CatalogFile= RtkFilter.cat
+Provider    = %REALTEK%
+DriverVer = 12/12/2019,1.6.1015.3010
+;*************************
+; Source file information
+;*************************
+[SourceDisksNames]
+1 = %DiskId1%,,,""
+[SourceDisksFiles]
+PidVid_List.dll         = 1
+RtkBtfilter.sys         = 1,,
+RtkBtManServ.exe	= 1,,      ;RtkServ
+rtl8761b_mp_chip_bt40_fw_asic_rom_patch_new.dll             =   1
+;*************************
+; Destination information
+;*************************
+[DestinationDirs]
+RsBthFilter.CopyList = 12
+RsBthpatch.CopyList = 10
+RtkBtManServ.CopyList = 10                      ;RtkServ
+[RsBthFilter.CopyList]
+RtkBtfilter.sys
+[RtkBtManServ.CopyList]                         ;RtkServ
+RtkBtManServ.exe                                ;RtkServ
+[RsBthpatch.CopyList]
+PidVid_List.dll,,,0x00002000
+rtl8761b_mp_chip_bt40_fw_asic_rom_patch_new.dll,,,0x00002000
+;*************************
+; Manufacturer information
+;*************************
+[Manufacturer]
+%REALTEK% = Realtek,NTamd64.10.0    ;NTamd64
+;We only support Vista and later
+[Realtek.NTamd64.10.0]   ;NTamd64
+%RealTK5.DeviceDesc%		=	RsBthFilter, USB\VID_0BDA&PID_8771    ;8761B
+%RealTK.DeviceDesc%		=	RsBthFilter, USB\VID_0BDA&PID_A725    ;8761B
+%ASUSBT500.DeviceDesc%		=	RsBthFilter, USB\VID_0B05&PID_190E    ;8761B
+
+[RsBthFilter.NT]
+Include=bth.inf
+Needs=BthUsb.NT
+CopyFiles=RsBthFilter.CopyList
+CopyFiles=RtkBtManServ.CopyList                   ;RtkServ
+CopyFiles=RsBthpatch.CopyList
+[RsBthFilter.NT.HW]
+include    = bth.inf
+needs      = BthUsb.NT.HW
+AddReg=RsBthFilter.NT.HW.Reg
+[RsBthFilter.NT.HW.Reg]
+HKR, , LowerFilters, 0x00010000, RtkBtFilter
+HKR, ,"RemoteWakeEnabled",0x00010001,1
+HKR, ,"DeviceRemoteWakeSupported",0x00010001,1
+HKR, ,"VsMsftOpCode",0x00010001,0Xfcf0
+[RsBthFilter.NT.Services]
+include    = bth.inf
+needs      = BthUsb.NT.Services
+;Addservice = BTHUSB, 0x00000002, BthUsb_Service_Inst, BthUsb_EventLog_Inst
+;Addservice = BTHPORT, , BthPort_Service_Inst, BthPort_EventLog_Inst
+AddService = RtkBtFilter, , RtkBtFilter_Service_Inst
+AddService = RtkBtManServ, 0x00000800, RtkBtManServ_Service_Inst     ;RtkServ
+[RtkBtFilter_Service_Inst]
+DisplayName     = %BtFilt.SvcDesc%                            
+ServiceType     = 1                  ; SERVICE_KERNEL_DRIVER
+StartType       = 3                  ; SERVICE_DEMAND_START
+ErrorControl    = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary   = %12%\RtkBtfilter.sys                            
+LoadOrderGroup = PNP Filter  
+AddReg=RsBthFilter_Services_Inst_AddReg
+[RsBthFilter_Services_Inst_AddReg]
+HKR,"Parameters","bPatchInSystemRoot",0x00010001,1    ; SetBit
+;HKR,"Parameters","bPatchInSystemRoot",0x00010001,0    ; ClearBit
+[RtkBtManServ_Service_Inst]                                        ;RtkServ
+DisplayName     = %RtkBtManServ.SvcDesc%                               ;RtkServ
+ServiceType     = 0x10                  ; Service                  ;RtkServ
+StartType       = 2                  ; SERVICE_DEMAND_START        ;RtkServ
+ErrorControl    = 0                  ; SERVICE_ERROR_NORMAL        ;RtkServ
+ServiceBinary   = %10%\RtkBtManServ.exe                            ;RtkServ
+;*****************************************
+; Bluetooth Filter String Section
+;*****************************************
+[Strings]
+REALTEK		= "Realtek Semiconductor Corp."
+DiskId1			= "Realtek Bluetooth Filter Installation Disk #1"
+BtFilt.SvcDesc		= "Realtek Bluetooth Filter Driver"
+RTK.DeviceDesc		= "Realtek Bluetooth 4.0 Adapter"
+RealTK.DeviceDesc		= "Realtek Bluetooth Adapter"
+RtkBtManServ.SvcDesc	= "Realtek Bluetooth Device Manager Service"    ;RtkServ
+ASUSBT500.DeviceDesc    = "ASUS USB-BT500"
+RealTK5.DeviceDesc		= "Realtek Bluetooth 5.0 Adapter"

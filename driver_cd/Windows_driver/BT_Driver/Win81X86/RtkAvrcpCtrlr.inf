@@ -1,0 +1,102 @@
+;
+; Copyright (c) 2010 Realtek Semiconductor Corp.
+;
+;Module Name:
+;
+;    RtkAvrcpCtrlr.INF
+;
+;Abstract:
+;    INF file for installing toaster device drivers
+;
+;--*/
+[Version]
+Signature="$CHICAGO$"
+Class=System
+ClassGuid ={4D36E97D-E325-11CE-BFC1-08002BE10318}
+Provider=%Realtek%
+DriverVer=05/18/2015,1.0.43.2
+CatalogFile=RtkAvrcpCtrlr.cat
+
+[DestinationDirs]
+;DefaultDestDir = 12
+CopyFiles = 12
+
+; ================= Class section =====================
+
+;[ClassInstall32]
+;Addreg=RtkAvrcpCtrlrClassReg  
+
+
+;[RtkAvrcpCtrlrClassReg]
+
+;*****************************************
+; RtkAvrcpCtrlr Device  Install Section
+;*****************************************
+
+[Manufacturer]
+%StdMfg%=Standard,NTx86,NTia64,NTamd64
+
+; For Win2K
+[Standard]
+; DisplayName       		Section           DeviceId
+; -----------       		-------           --------
+%RtkAvrcpCtrlrDevice.DeviceDesc%=RtkAvrcpCtrlr_Device, BTHENUM\{0000110C-0000-1000-8000-00805f9b34fb}_LOCALMFG&005d
+
+; For Win2K
+[Standard.NTx86]
+%RtkAvrcpCtrlrDevice.DeviceDesc%=RtkAvrcpCtrlr_Device, BTHENUM\{0000110C-0000-1000-8000-00805f9b34fb}_LOCALMFG&005d
+
+[Standard.NTia64]
+%RtkAvrcpCtrlrDevice.DeviceDesc%=RtkAvrcpCtrlr_Device, BTHENUM\{0000110C-0000-1000-8000-00805f9b34fb}_LOCALMFG&005d
+
+[Standard.NTamd64]
+%RtkAvrcpCtrlrDevice.DeviceDesc%=RtkAvrcpCtrlr_Device, BTHENUM\{0000110C-0000-1000-8000-00805f9b34fb}_LOCALMFG&005d
+
+
+[RtkAvrcpCtrlr_Device.NT]
+CopyFiles = CopyFiles
+
+[CopyFiles]
+RtkAvrcpCtrlr.sys
+
+[RtkAvrcpCtrlr_Device.NT.HW]
+AddReg=RtkAvrcpCtrlr_Device.NT.HW.AddReg
+
+[RtkAvrcpCtrlr_Device.NT.HW.AddReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,100
+;HKR,,Installer32,,"tostrcls.dll,RtkAvrcpCtrlrClassInstaller"
+HKR,,DeviceCharacteristics,0x10001,0x100     ;Use same security checks on relative opens
+HKR,,Security,,"D:P(A;;GA;;;SY)(A;;GA;;;BA)" ;Allow generic all access to system and built-in Admin. 
+                                             ;This one overrides the security set by the driver
+
+;-------------- Service installation
+
+[RtkAvrcpCtrlr_Device.NT.Services]
+AddService = RtkAvrcpCtrlr, %SPSVCINST_ASSOCSERVICE%, RtkAvrcpCtrlr_Service_Inst
+
+[RtkAvrcpCtrlr_Service_Inst]
+DisplayName    = %RtkAvrcpCtrlr.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START 
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\RtkAvrcpCtrlr.sys
+LoadOrderGroup = Extended Base
+
+
+[SourceDisksNames]
+1 = %DiskId1%,,,""
+
+[SourceDisksFiles]
+RtkAvrcpCtrlr.sys  = 1,,
+;tostrcls.dll = 1,,
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+Realtek = "Realtek Semiconductor Corp."
+StdMfg = "(Standard system devices)"
+ClassName = "RtkAvrcpCtrlr"
+DiskId1 = "Realtek Bluetooth A/V Remote Control Controller Installation Disk #1"
+RtkAvrcpCtrlrDevice.DeviceDesc = "Realtek Bluetooth A/V Remote Control Controller"
+RtkAvrcpCtrlr.SVCDESC = "Realtek Bluetooth A/V Remote Control Controller Device Driver"
+
